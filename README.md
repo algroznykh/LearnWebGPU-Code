@@ -16,10 +16,7 @@ Building
 
 ```
 cmake . -B build -DWEBGPU_BACKEND=DAWN
-=======
-git checkout <the branch of your choice>
-cmake . -B build
 cmake --build build
 ```
 
-Then run either `./build/App` (linux/macOS/MinGW) or `build\Debug\App.exe` (MSVC).
+Then run `./build/App`
