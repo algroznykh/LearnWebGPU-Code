@@ -61,8 +61,8 @@ using glm::vec4;
 using glm::vec3;
 using glm::vec2;
 
-int WIDTH = 1920;
-int HEIGHT = 1080;
+int WIDTH = 640;
+int HEIGHT = 480;
 
 // == Utils == //
 
@@ -141,36 +141,38 @@ bool Application::initDevice() {
 	std::cout << "Requesting device..." << std::endl;
 	SupportedLimits supportedLimits;
 	m_adapter.getLimits(&supportedLimits);
+	std::cout << "getting Limits" << std::endl;
 	RequiredLimits requiredLimits = Default;
-	// requiredLimits.limits.maxVertexAttributes = 6;
-	// requiredLimits.limits.maxVertexBuffers = 1;
-	// requiredLimits.limits.maxBindGroups = 3;
-	// requiredLimits.limits.maxUniformBuffersPerShaderStage = 2;
-	// requiredLimits.limits.maxUniformBufferBindingSize = 16 * 4 * sizeof(float) + 2 * sizeof(uint32_t);
-	// requiredLimits.limits.minStorageBufferOffsetAlignment = supportedLimits.limits.minStorageBufferOffsetAlignment;
-	// requiredLimits.limits.maxBufferSize = 9000;
-	// requiredLimits.limits.maxTextureDimension1D = 2048;
-	// requiredLimits.limits.maxTextureDimension2D = 2048;
-	// requiredLimits.limits.maxTextureDimension3D = 2048;
-	// requiredLimits.limits.maxTextureArrayLayers = 1;
-	// requiredLimits.limits.maxSampledTexturesPerShaderStage = 3;
-	// requiredLimits.limits.maxSamplersPerShaderStage = 1;
-	// requiredLimits.limits.maxVertexBufferArrayStride = 68;
-	// requiredLimits.limits.maxInterStageShaderComponents = 17;
-	// requiredLimits.limits.maxStorageBuffersPerShaderStage = 2;
-	// requiredLimits.limits.maxComputeWorkgroupSizeX = 8;
-	// requiredLimits.limits.maxComputeWorkgroupSizeY = 8;
-	// requiredLimits.limits.maxComputeWorkgroupSizeZ = 1;
-	// requiredLimits.limits.maxComputeInvocationsPerWorkgroup = 64;
-	// requiredLimits.limits.maxComputeWorkgroupsPerDimension = 2;
-	// requiredLimits.limits.maxStorageBufferBindingSize = 0;
-	// requiredLimits.limits.maxStorageTexturesPerShaderStage = 1;
+	 requiredLimits.limits.maxVertexAttributes = 6;
+	 requiredLimits.limits.maxVertexBuffers = 1;
+	 requiredLimits.limits.maxBindGroups = 3;
+	 requiredLimits.limits.maxUniformBuffersPerShaderStage = 2;
+	 requiredLimits.limits.maxUniformBufferBindingSize = 16 * 4 * sizeof(float) + 2 * sizeof(uint32_t);
+	 requiredLimits.limits.minStorageBufferOffsetAlignment = supportedLimits.limits.minStorageBufferOffsetAlignment;
+	 requiredLimits.limits.maxBufferSize = 9000;
+	 requiredLimits.limits.maxTextureDimension1D = 2048;
+	 requiredLimits.limits.maxTextureDimension2D = 2048;
+	 requiredLimits.limits.maxTextureDimension3D = 2048;
+	 requiredLimits.limits.maxTextureArrayLayers = 1;
+	 requiredLimits.limits.maxSampledTexturesPerShaderStage = 3;
+	 requiredLimits.limits.maxSamplersPerShaderStage = 1;
+	 requiredLimits.limits.maxVertexBufferArrayStride = 68;
+	 requiredLimits.limits.maxInterStageShaderComponents = 17;
+	 requiredLimits.limits.maxStorageBuffersPerShaderStage = 2;
+	 requiredLimits.limits.maxComputeWorkgroupSizeX = 8;
+	 requiredLimits.limits.maxComputeWorkgroupSizeY = 8;
+	 requiredLimits.limits.maxComputeWorkgroupSizeZ = 1;
+	 requiredLimits.limits.maxComputeInvocationsPerWorkgroup = 64;
+	 requiredLimits.limits.maxComputeWorkgroupsPerDimension = 2;
+	 requiredLimits.limits.maxStorageBufferBindingSize = 0;
+	 requiredLimits.limits.maxStorageTexturesPerShaderStage = 1;
 
 	// Create device
 	DeviceDescriptor deviceDesc{};
 	deviceDesc.label = "My Device";
 	// deviceDesc.requiredFeaturesCount = 0;
-	deviceDesc.requiredLimits = &requiredLimits;
+	// deviceDesc.requiredLimits = &requiredLimits;
+    std::cout << "no limits" ;
 	deviceDesc.defaultQueue.label = "The default queue";
 	m_device = m_adapter.requestDevice(deviceDesc);
 	std::cout << "Got device: " << m_device << std::endl;

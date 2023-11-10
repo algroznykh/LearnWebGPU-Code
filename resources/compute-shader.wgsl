@@ -8,8 +8,8 @@ struct Storages {
     states: array<array<f32, 12>>,
 }
 
-const SCREEN_WIDTH: i32 = 1920;
-const SCREEN_HEIGHT: i32 = 1080;
+const SCREEN_WIDTH: i32 = 640;
+const SCREEN_HEIGHT: i32 = 480;
 
 // @group(0) @binding(0) var inputTexture: texture_2d<f32>;
 @group(0) @binding(0) var outputTexture: texture_storage_2d<rgba8unorm, write>;

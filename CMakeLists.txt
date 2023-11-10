@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.1...3.25)
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_C_COMPILER /usr/bin/gcc-11)
+set (CMAKE_CXX_COMPILER /usr/bin/g++-11)
+# set (CMAKE_COMPILE_WARNING_AS_ERROR FALSE)
 project(
 	LearnWebGPU
 	VERSION 0.1.0
