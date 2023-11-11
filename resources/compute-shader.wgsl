@@ -87,6 +87,19 @@ fn get_index(idx : u32, idy: u32, screen_size: vec2u) -> i32 {
 }
 
 
+fn camlap(coord: vec2i) -> vec4f {
+    let lapmat = mat3x3<f32>(1, 2, 1, 2, -12, 2, 1, 2, 1);
+    var res = vec4f(0.);
+    for (var i = -1; i<3; i++) {
+    for (var j = -1; j<3; j++) {
+        res += textureLoad(camTexture, coord + vec2i(i, j), 0) * lapmat[i+1][j+1];
+
+    }}
+    res /= 8.;
+    return res;
+}
+
+
 @compute @workgroup_size(16, 16)
 fn main_image(@builtin(global_invocation_id) id: vec3u) {
     // setup
@@ -94,8 +107,9 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
     if (id.x >= screen_size.x || id.y >= screen_size.y) { return; }
     current_index = vec2i(i32(id.x), i32(id.y));
 
-    let fragCoord = vec2i(i32(id.x), i32(screen_size.y - id.y) );
-    let tex = textureLoad(camTexture, fragCoord, 0);
+    let fragCoord = vec2i(i32(id.x), i32(id.y) );
+    // let tex = textureLoad(camTexture, fragCoord, 0);
+    let tex = camlap(fragCoord);
 
 
     // initial state
@@ -120,9 +134,9 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
     }
 
     var ps = array<f32, 12>(
-        lap(0u) + tex.r,
-        lap(1u) + tex.g,
-        lap(2u) + tex.b,
+        lap(0u),
+        lap(1u),
+        lap(2u),
         lap(3u),
 
         sobx(4u),
@@ -133,7 +147,7 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
         soby(8u),
         soby(9u),
         soby(10u),
-        soby(11u)
+        soby(11u) 
     );
 
     // update state
@@ -145,6 +159,7 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
         let i = get_index(id.x, id.y, screen_size);
         storages.states[i][s] += dx[s];
         storages.states[i][s] = clamp(storages.states[i][s], -1., 1.);
+        storages.states[i][s] += tex.r * .1;
     
         
     }
