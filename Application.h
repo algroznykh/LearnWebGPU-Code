@@ -129,6 +129,7 @@ private:
 	wgpu::TextureView m_outputTextureView = nullptr;
 
 	wgpu::Extent3D textureSize;
+	wgpu::Extent3D camtextureSize;
 
 
 	// Values exposed to the UI

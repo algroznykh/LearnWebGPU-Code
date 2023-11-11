@@ -100,7 +100,10 @@ bool Application::onInit() {
 	initTextureViews();
 	initBindGroup();
 
-	this->VideoCapture.open(0);
+	this->VideoCapture.open(4);
+
+	this->VideoCapture.set(cv::CAP_PROP_FRAME_WIDTH,640);
+	this->VideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT,480);
 
 	return true;
 }
@@ -317,6 +320,8 @@ void Application::initTextures() {
 	// uint8_t* pixelData = stbi_load(RESOURCE_DIR "/input.jpg", &width, &height, &channels, 4 /* force 4 channels */);
 	// if (nullptr == pixelData) throw std::runtime_error("Could not load input texture!");
 	this->textureSize = { (uint32_t)width, (uint32_t)height, 1 };
+	this->camtextureSize = { (uint32_t)width, (uint32_t)height, 1 };
+
 
 	// Create texture
 	TextureDescriptor textureDesc;
@@ -347,7 +352,7 @@ void Application::initTextures() {
 	TextureDescriptor camDesc;
 	camDesc.dimension = TextureDimension::_2D;
 	camDesc.format = TextureFormat::RGBA8Unorm;
-	camDesc.size = textureSize;
+	camDesc.size = camtextureSize;
 	camDesc.sampleCount = 1;
 	camDesc.viewFormatCount = 0;
 	camDesc.viewFormats = nullptr;
@@ -605,6 +610,8 @@ void Application::onCompute() {
 	this->VideoCapture.read(this->CamFrame);
 	cv::Mat frame_rgba;
 	cv::cvtColor(this->CamFrame, frame_rgba, cv::COLOR_BGR2RGBA);
+	cv::Mat resized;
+	cv::resize(frame_rgba, resized, cv::Size(WIDTH, HEIGHT));
 	// m_uniforms.tex = CamFrame;
 
 	ImageCopyTexture destination;
@@ -614,10 +621,10 @@ void Application::onCompute() {
 	destination.mipLevel = 0;
 	TextureDataLayout source;
 	source.offset = 0;
-	source.bytesPerRow = 4 * frame_rgba.cols;
-	source.rowsPerImage = frame_rgba.rows;
+	source.bytesPerRow = 4 * resized.cols;
+	source.rowsPerImage = resized.rows;
 
-	m_queue.writeTexture(destination, frame_rgba.data, frame_rgba.total() * frame_rgba.elemSize(), source, textureSize);
+	m_queue.writeTexture(destination, resized.data, resized.total() * resized.elemSize(), source, this->camtextureSize);
 
 	// Free CPU-side data
 	// stbi_image_free(CamFrame);
