@@ -15,7 +15,7 @@ const SCREEN_HEIGHT: i32 = 1080;
 @group(0) @binding(0) var outputTexture: texture_storage_2d<rgba8unorm, write>;
 @group(0) @binding(1) var<uniform> uniforms: Uniforms;
 @group(0) @binding(2) var<storage, read_write> storages: Storages;
-
+@group(0) @binding(3) var camTexture: texture_2d<f32>;
 
 const N = 12u;
 const S = 5000.;
@@ -94,6 +94,10 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
     if (id.x >= screen_size.x || id.y >= screen_size.y) { return; }
     current_index = vec2i(i32(id.x), i32(id.y));
 
+    let fragCoord = vec2i(i32(id.x), i32(screen_size.y - id.y) );
+    let tex = textureLoad(camTexture, fragCoord, 0);
+
+
     // initial state
     if (uniforms.frame == 1) {
         for (var s=0u; s<N; s++) {
@@ -116,9 +120,9 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
     }
 
     var ps = array<f32, 12>(
-        lap(0u),
-        lap(1u),
-        lap(2u),
+        lap(0u) + tex.r,
+        lap(1u) + tex.g,
+        lap(2u) + tex.b,
         lap(3u),
 
         sobx(4u),

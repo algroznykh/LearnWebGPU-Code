@@ -45,6 +45,8 @@
 #include <webgpu/webgpu.hpp>
 #include "webgpu-release.h"
 
+#include <opencv2/opencv.hpp>
+
 #include <iostream>
 #include <cassert>
 #include <filesystem>
@@ -97,6 +99,9 @@ bool Application::onInit() {
 	initTextures();
 	initTextureViews();
 	initBindGroup();
+
+	this->VideoCapture.open(0);
+
 	return true;
 }
 
@@ -311,7 +316,7 @@ void Application::initTextures() {
 	height = HEIGHT ;
 	// uint8_t* pixelData = stbi_load(RESOURCE_DIR "/input.jpg", &width, &height, &channels, 4 /* force 4 channels */);
 	// if (nullptr == pixelData) throw std::runtime_error("Could not load input texture!");
-	Extent3D textureSize = { (uint32_t)width, (uint32_t)height, 1 };
+	this->textureSize = { (uint32_t)width, (uint32_t)height, 1 };
 
 	// Create texture
 	TextureDescriptor textureDesc;
@@ -338,6 +343,18 @@ void Application::initTextures() {
 	);
 	m_outputTexture = m_device.createTexture(textureDesc);
 
+	// Create cam texture
+	TextureDescriptor camDesc;
+	camDesc.dimension = TextureDimension::_2D;
+	camDesc.format = TextureFormat::RGBA8Unorm;
+	camDesc.size = textureSize;
+	camDesc.sampleCount = 1;
+	camDesc.viewFormatCount = 0;
+	camDesc.viewFormats = nullptr;
+	camDesc.mipLevelCount = 1;
+	camDesc.usage = (TextureUsage::TextureBinding | TextureUsage::CopyDst);
+	m_camTexture = m_device.createTexture(camDesc);
+
 	// Upload texture data for MIP level 0 to the GPU
 	// ImageCopyTexture destination;
 	// // destination.texture = m_inputTexture;
@@ -345,7 +362,7 @@ void Application::initTextures() {
 	// destination.aspect = TextureAspect::All;
 	// destination.mipLevel = 0;
 	// TextureDataLayout source;
-	// source.offset = 0;
+	// source.offset = 0;m_camTe
 	// source.bytesPerRow = 4 * textureSize.width;
 	// source.rowsPerImage = textureSize.height;
 	// m_queue.writeTexture(destination, pixelData, (size_t)(4 * width * height), source, textureSize);
@@ -359,7 +376,9 @@ void Application::terminateTextures() {
 	// wgpuTextureRelease(m_inputTexture);
 
 	m_outputTexture.destroy();
+	m_camTexture.destroy();
 	wgpuTextureRelease(m_outputTexture);
+	wgpuTextureRelease(m_camTexture);
 }
 
 void Application::initTextureViews() {
@@ -377,6 +396,9 @@ void Application::initTextureViews() {
 
 	textureViewDesc.label = "Output";
 	m_outputTextureView = m_outputTexture.createView(textureViewDesc);
+
+	textureViewDesc.label = "Camera";
+	m_camTextureView = m_camTexture.createView(textureViewDesc);
 }
 
 void Application::terminateTextureViews() {
@@ -386,7 +408,7 @@ void Application::terminateTextureViews() {
 
 void Application::initBindGroup() {
 	// Create compute bind group
-	std::vector<BindGroupEntry> entries(3, Default);
+	std::vector<BindGroupEntry> entries(4, Default);
 
 	// Input buffer
 	// entries[0].binding = 0;
@@ -409,6 +431,13 @@ void Application::initBindGroup() {
 	entries[2].offset = 0;
 	entries[2].size = sizeof(Storages);
 
+	// Cam texture
+	entries[3].binding = 3;
+	entries[3].textureView = m_camTextureView;
+	// entries[3].buffer = m_camTexture;
+	// entries[3].offset = 0;
+	// entries[3].textureView 
+
 	BindGroupDescriptor bindGroupDesc;
 	bindGroupDesc.layout = m_bindGroupLayout;
 	bindGroupDesc.entryCount = (uint32_t)entries.size();
@@ -422,7 +451,7 @@ void Application::terminateBindGroup() {
 
 void Application::initBindGroupLayout() {
 	// Create bind group layout
-	std::vector<BindGroupLayoutEntry> bindings(3, Default);
+	std::vector<BindGroupLayoutEntry> bindings(4, Default);
 
 	// // Input image: MIP level 0 of the texture
 	// bindings[0].binding = 0;
@@ -448,6 +477,11 @@ void Application::initBindGroupLayout() {
 	bindings[2].buffer.type = BufferBindingType::Storage;
 	bindings[2].buffer.minBindingSize = sizeof(Storages);
 	bindings[2].visibility = ShaderStage::Compute;
+
+	bindings[3].binding = 3;
+	bindings[3].texture.sampleType = TextureSampleType::Float;
+	bindings[3].texture.viewDimension = TextureViewDimension::_2D;
+	bindings[3].visibility = ShaderStage::Compute;
 
 	BindGroupLayoutDescriptor bindGroupLayoutDesc;
 	bindGroupLayoutDesc.entryCount = (uint32_t)bindings.size();
@@ -486,8 +520,6 @@ void Application::terminateComputePipeline() {
 
 void Application::onFrame() {
 	glfwPollEvents();
-
-	// TODO increment frame number
 
 	TextureView nextTexture = m_swapChain.getCurrentTextureView();
 	if (!nextTexture) {
@@ -567,6 +599,28 @@ void Application::onGui(RenderPassEncoder renderPass) {
 
 void Application::onCompute() {
 	std::cout << "frame " << m_uniforms.frame << std::endl;
+
+	// cv::VideoCapture VideoCapture;
+
+	this->VideoCapture.read(this->CamFrame);
+	cv::Mat frame_rgba;
+	cv::cvtColor(this->CamFrame, frame_rgba, cv::COLOR_BGR2RGBA);
+	// m_uniforms.tex = CamFrame;
+
+	ImageCopyTexture destination;
+	destination.texture = m_camTexture;
+	destination.origin = { 0, 0, 0 };
+	destination.aspect = TextureAspect::All;
+	destination.mipLevel = 0;
+	TextureDataLayout source;
+	source.offset = 0;
+	source.bytesPerRow = 4 * frame_rgba.cols;
+	source.rowsPerImage = frame_rgba.rows;
+
+	m_queue.writeTexture(destination, frame_rgba.data, frame_rgba.total() * frame_rgba.elemSize(), source, textureSize);
+
+	// Free CPU-side data
+	// stbi_image_free(CamFrame);
 
 	// Update uniforms
 	m_queue.writeBuffer(m_uniformBuffer, 0, &m_uniforms, sizeof(Uniforms));
