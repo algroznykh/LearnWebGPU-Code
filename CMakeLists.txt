@@ -20,6 +20,10 @@ add_subdirectory(webgpu)
 add_subdirectory(glfw3webgpu)
 add_subdirectory(imgui)
 
+# add opencv
+find_package(OpenCV REQUIRED)
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+
 add_executable(App
 	Application.h
 	Application.cpp
@@ -49,7 +53,7 @@ else()
 endif()
 
 target_include_directories(App PRIVATE .)
-target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu imgui)
+target_link_libraries(App PRIVATE webgpu glfw glfw3webgpu imgui ${OpenCV_LIBS})
 target_compile_definitions(App PRIVATE NOMINMAX)
 
 if(MSVC)

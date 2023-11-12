@@ -32,6 +32,9 @@
 
 #include <glm/glm.hpp>
 
+#include <opencv2/opencv.hpp>
+
+
 class Application {
 public:
 	// A function called only once at the beginning. Returns false is init failed.
@@ -52,6 +55,11 @@ public:
 	// A function that tells if the compute pass should be executed
 	// (i.e., when filter parameters changed)
 	bool shouldCompute();
+
+
+	cv::Mat CamFrame;
+
+	cv::VideoCapture VideoCapture;
 
 public:
 	// A function called when we should draw the GUI.
@@ -113,9 +121,16 @@ private:
 	wgpu::Buffer m_uniformBuffer = nullptr;
 	wgpu::Buffer m_storageBuffer = nullptr;
 	wgpu::Texture m_inputTexture = nullptr;
+	wgpu::Texture m_camTexture = nullptr;
+
 	wgpu::Texture m_outputTexture = nullptr;
 	wgpu::TextureView m_inputTextureView = nullptr;
+	wgpu::TextureView m_camTextureView = nullptr;
 	wgpu::TextureView m_outputTextureView = nullptr;
+
+	wgpu::Extent3D textureSize;
+	wgpu::Extent3D camtextureSize;
+
 
 	// Values exposed to the UI
 	enum class FilterType {
@@ -136,6 +151,7 @@ private:
 		// float test = 0.5f;
 		uint32_t filterType = 0;
 		uint32_t frame = 0;
+		// glm::texture tex = glm::texture;
 		float _pad[2];
 
 	};

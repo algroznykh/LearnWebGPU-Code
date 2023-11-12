@@ -3,7 +3,7 @@
  *   https://github.com/eliemichel/LearnWebGPU
  *
  * MIT License
- * Copyright (c) 2022-2023 Elie Michel
+ * Copyright (c) 2022-2023 Elie MichelVideoCapture.open(0);
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,11 +32,8 @@ int main(int, char**) {
 
 	while (app.isRunning()) {
 		app.onFrame();
+		app.onCompute();
 
-		if (app.shouldCompute()) {
-			app.onCompute();
-		}
-		// break;
 	}
 
 	app.onFinish();
