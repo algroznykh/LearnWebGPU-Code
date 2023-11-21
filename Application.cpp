@@ -63,8 +63,8 @@ using glm::vec4;
 using glm::vec3;
 using glm::vec2;
 
-int WIDTH = 1920;
-int HEIGHT = 1080;
+int WIDTH = 640;
+int HEIGHT = 480;
 
 // == Utils == //
 
@@ -88,7 +88,7 @@ void onWindowResize(GLFWwindow* window, int width, int height) {
 
 // == Application == //
 
-bool Application::onInit() {
+bool Application::onInit(int cam_dev) {
 	if (!initWindow()) return false;
 	if (!initDevice()) return false;
 	initSwapChain();
@@ -100,7 +100,7 @@ bool Application::onInit() {
 	initTextureViews();
 	initBindGroup();
 
-	this->VideoCapture.open(4);
+	this->VideoCapture.open(cam_dev);
 
 	this->VideoCapture.set(cv::CAP_PROP_FRAME_WIDTH,640);
 	this->VideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT,480);

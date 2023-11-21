@@ -38,7 +38,7 @@
 class Application {
 public:
 	// A function called only once at the beginning. Returns false is init failed.
-	bool onInit();
+	bool onInit(int cam_dev);
 
 	// A function called only once at the very end.
 	void onFinish();

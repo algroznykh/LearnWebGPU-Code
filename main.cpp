@@ -24,11 +24,21 @@
  * SOFTWARE.
  */
 
+#include <iostream>
+#include <stdlib.h>
+
 #include "Application.h"
 
-int main(int, char**) {
+int main(int argc, char** argv) {
 	Application app;
-	app.onInit();
+    double cam_dev;
+    if (argc > 1) {
+        cam_dev = atof(argv[1]);
+    }
+    else {
+        cam_dev = 0;
+    }
+	app.onInit(cam_dev);
 
 	while (app.isRunning()) {
 		app.onFrame();
