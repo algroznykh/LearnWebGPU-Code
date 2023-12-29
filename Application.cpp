@@ -63,8 +63,8 @@ using glm::vec4;
 using glm::vec3;
 using glm::vec2;
 
-int WIDTH = 640;
-int HEIGHT = 480;
+int WIDTH = 1920;
+int HEIGHT = 1080;
 
 // == Utils == //
 
