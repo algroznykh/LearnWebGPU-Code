@@ -156,9 +156,9 @@ fn main_image(@builtin(global_invocation_id) id: vec3u) {
 
 
 		var ps = array<f32, 12>(
-			lap(0u) + (tex.r - .5) *  1.  ,
-			lap(1u) + (tex.g - .5 ) * 1.  ,
-			lap(2u) + (tex.b - .5 ) * 1.  ,
+			lap(0u) + sin((tex.r - .5) * 3.14),
+			lap(1u) + sin((tex.g - .5 ) * 3.14 ),
+			lap(2u) + sin((tex.b - .5 ) * 3.14 ),
 			lap(3u),
 
 			sobx(4u),

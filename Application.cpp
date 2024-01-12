@@ -63,8 +63,8 @@ using glm::vec4;
 using glm::vec3;
 using glm::vec2;
 
-int WIDTH = 640;
-int HEIGHT = 480;
+int WIDTH = 1280;
+int HEIGHT = 800;
 
 // == Utils == //
 
@@ -100,10 +100,12 @@ bool Application::onInit() {
 	initTextureViews();
 	initBindGroup();
 
-	this->VideoCapture.open(4);
 
-	this->VideoCapture.set(cv::CAP_PROP_FRAME_WIDTH,640);
-	this->VideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT,480);
+	this->VideoCapture.open(0);
+	this->VideoCapture.set(cv::CAP_PROP_FRAME_WIDTH,320);
+	this->VideoCapture.set(cv::CAP_PROP_FRAME_HEIGHT,240);
+    //this->VideoCapture.set(cv::CAP_PROP_BUFFERSIZE, 3); // internal buffer will now store only 3 frames
+    this->VideoCapture.set(cv::CAP_PROP_FPS, 30); 
 
 	return true;
 }
